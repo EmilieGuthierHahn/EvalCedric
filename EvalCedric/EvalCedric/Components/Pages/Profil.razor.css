@@ -1,0 +1,144 @@
+﻿
+@keyframes rainbow-animation {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+
+.dossier-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    background: linear-gradient(145deg, #1d1029, #2c1a3e); 
+    border: 2px solid #a881d4;
+    border-radius: 20px;
+    box-shadow: 0 0 25px rgba(168, 129, 212, 0.6), 0 0 10px rgba(255, 255, 255, 0.2) inset;
+    font-family: 'Cinzel', serif; 
+    overflow: hidden;
+    position: relative;
+}
+
+
+.dossier-header {
+    height: auto; 
+    min-height: 200px;
+    display: flex;
+    align-items: center; 
+    padding: 2rem;
+    background: url('https://www.transparenttextures.com/patterns/stardust.png'), linear-gradient(145deg, #1d1029, #412a5c);
+    background-blend-mode: overlay;
+    border-bottom: 2px solid #a881d4;
+}
+
+.dossier-image-wrapper {
+    position: relative;
+    z-index: 2;
+    flex-shrink: 0; 
+}
+
+.dossier-image {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%; 
+    object-fit: cover;
+    border: 5px solid #dcd0ff;
+    box-shadow: 0 0 20px #dcd0ff;
+}
+
+.dossier-identity {
+    flex-grow: 1;
+    padding: 1rem;
+    text-align: center;
+    background-color: transparent;
+}
+
+.dossier-name {
+    font-size: 3rem;
+    font-weight: 700;
+    margin: 0;
+    background: linear-gradient(124deg, #ff2400, #e81d1d, #e8b71d, #e3e81d, #1de840, #1ddde8, #2b1de8, #dd00f3, #dd00f3);
+    background-size: 1800% 1800%; 
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent; 
+    animation: rainbow-animation 20s ease infinite;
+}
+
+.dossier-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr; 
+    gap: 2rem; 
+    padding: 2rem;
+}
+
+.dossier-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem; 
+}
+
+.detail-item, .detail-item-full {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(168, 129, 212, 0.3);
+    border-radius: 10px;
+    padding: 1rem;
+    transition: all 0.3s ease;
+}
+
+    .detail-item:hover, .detail-item-full:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        border-color: #dcd0ff;
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(168, 129, 212, 0.2);
+    }
+
+.detail-label {
+    display: block;
+    font-size: 0.9rem;
+    color: #a881d4;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+}
+
+.detail-value, .detail-text {
+    font-size: 1.1rem;
+    color: #f0e8ff;
+    line-height: 1.6;
+}
+
+.detail-text {
+    font-family: sans-serif; 
+}
+
+.dossier-footer {
+    padding: 1.5rem 2rem;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-top: 1px solid #a881d4;
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+}
+.action-buttons {
+    display: flex;
+    gap: 1rem; 
+}
+
+.btn-outline-secondary {
+    color: #dcd0ff;
+    border-color: #a881d4;
+}
+
+    .btn-outline-secondary:hover {
+        color: #1d1029;
+        background-color: #dcd0ff;
+        border-color: #dcd0ff;
+    }

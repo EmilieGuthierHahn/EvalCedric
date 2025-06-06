@@ -1,0 +1,151 @@
+﻿@page "/profil/{Id:int}"
+@rendermode InteractiveServer
+
+@using EvalCedric.Data
+@using EvalCedric.Models
+@using Microsoft.EntityFrameworkCore
+
+@inject ApplicationDbContext DbContext
+@inject NavigationManager NavigationManager
+
+<PageTitle>Dossier : @(unicorn?.Name ?? "Chargement...")</PageTitle>
+
+@if (unicorn != null)
+{
+    <div class="dossier-container">
+        <div class="dossier-header">
+            <div class="dossier-image-wrapper">
+                <img src="@unicorn.ImageUrl" alt="Profil de @unicorn.Name" class="dossier-image"
+                     onerror="this.onerror=null; this.src='https://placehold.co/150/000/FFF?text=🖼️';" />
+            </div>
+            <div class="dossier-identity">
+                <h1 class="dossier-name">@unicorn.Name</h1>
+            </div>
+        </div>
+
+        <div class="dossier-body">
+            <div class="dossier-column">
+                <div class="detail-item">
+                    <span class="detail-label">ID du Sanctuaire</span>
+                    <span class="detail-value">#@unicorn.Id</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Âge estimé</span>
+                    <span class="detail-value">@unicorn.Age ans</span>
+                </div>
+                @if (unicorn.Breed != null)
+                {
+                    <div class="detail-item">
+                        <span class="detail-label">Race</span>
+                        <span class="detail-value">@unicorn.Breed.Name</span>
+                    </div>
+                }
+                <div class="detail-item-full">
+                    <span class="detail-label">Notes de l'Archiviste</span>
+                    <p class="detail-text">@unicorn.Description</p>
+                </div>
+            </div>
+            <div class="dossier-column">
+                <div class="detail-item">
+                    <span class="detail-label">Couleur de robe</span>
+                    <span class="detail-value">@unicorn.Color</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Habitat Naturel</span>
+                    <span class="detail-value">@unicorn.Habitat</span>
+                </div>
+                <div class="detail-item-full">
+                    <span class="detail-label">Pouvoirs Magiques Répertoriés</span>
+                    <p class="detail-text">@unicorn.MagicalPowers</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="dossier-footer">
+            <button class="btn btn-outline-secondary" @onclick="RetourAuCodex">
+                <i class="fas fa-arrow-left"></i> Retour
+            </button>
+            <div class="action-buttons">
+                <button class="btn btn-warning" @onclick="ModifierLicorne">
+                    <i class="fas fa-pencil-alt"></i> Modifier
+                </button>
+                <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">
+                    <i class="fas fa-trash-alt"></i> Supprimer
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content bg-dark text-white">
+                <div class="modal-header border-danger">
+                    <h5 class="modal-title" id="modalLabel"><i class="fas fa-exclamation-triangle"></i> Confirmation Requise</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Êtes-vous absolument certain de vouloir bannir <strong>@unicorn.Name</strong> du Sanctuaire ?</p>
+                    <p class="text-danger fw-bold">Cette action est définitive et ne pourra être annulée.</p>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-danger" @onclick="SupprimerLicorneAsync" data-bs-dismiss="modal">Confirmer la Suppression</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="text-center mt-5">
+        <div class="spinner-border text-light" style="width: 3rem; height: 3rem;" role="status">
+            <span class="visually-hidden">Recherche dans le Codex...</span>
+        </div>
+        <p class="mt-3 fs-4 text-secondary">Recherche du spécimen dans les archives du Sanctuaire...</p>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Unicorn? unicorn;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        unicorn = await DbContext.Unicorns
+                                 .Include(u => u.Breed)
+                                 .FirstOrDefaultAsync(u => u.Id == Id);
+    }
+
+    private void RetourAuCodex()
+    {
+        NavigationManager.NavigateTo("/codex");
+    }
+
+  
+    private void ModifierLicorne()
+    {
+       
+        NavigationManager.NavigateTo($"/modifier/{Id}");
+    }
+
+  
+    private async Task SupprimerLicorneAsync()
+    {
+       
+        if (unicorn != null)
+        {
+            try
+            {
+                DbContext.Unicorns.Remove(unicorn);
+                await DbContext.SaveChangesAsync();
+                NavigationManager.NavigateTo("/codex");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erreur lors de la suppression : {ex.Message}");
+            }
+        }
+    }
+}

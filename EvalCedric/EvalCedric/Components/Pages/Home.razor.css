@@ -1,0 +1,193 @@
+﻿
+@keyframes rainbow-animation {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes animation-etoile {
+    from {
+        transform: translateY(0) translateX(0) rotate(20deg);
+        opacity: 1;
+    }
+
+    to {
+        transform: translateY(-50vh) translateX(100vw) rotate(20deg);
+        opacity: 0;
+    }
+}
+
+
+.accueil-container {
+    height: calc(100vh - 56px); 
+    min-height: 600px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    position: relative; 
+    overflow: hidden; 
+    background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+    font-family: 'Cinzel', serif; 
+}
+
+
+
+.etoiles-filantes {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+.etoile {
+    position: absolute;
+    top: 50%; 
+    left: -5%; 
+    width: 2px;
+    height: 2px;
+    background-color: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 6px 0.5px #fff;
+    animation-name: animation-etoile;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+ 
+    .etoile:nth-child(1) {
+        animation-duration: 10s;
+        animation-delay: 0s;
+    }
+
+    .etoile:nth-child(2) {
+        animation-duration: 8s;
+        animation-delay: 2s;
+        top: 30%;
+    }
+
+    .etoile:nth-child(3) {
+        animation-duration: 12s;
+        animation-delay: 5s;
+        top: 60%;
+    }
+
+    .etoile:nth-child(4) {
+        animation-duration: 7s;
+        animation-delay: 8s;
+        top: 40%;
+    }
+
+    .etoile:nth-child(5) {
+        animation-duration: 15s;
+        animation-delay: 10s;
+        top: 70%;
+    }
+
+
+
+
+.accueil-content {
+    position: relative; 
+    z-index: 1;
+    text-align: center;
+    color: #fff;
+    background-color: rgba(29, 16, 41, 0.6); 
+    padding: 2rem 3rem;
+    border-radius: 15px;
+    border: 1px solid rgba(168, 129, 212, 0.4);
+    backdrop-filter: blur(5px); 
+    box-shadow: 0 0 30px rgba(168, 129, 212, 0.3);
+}
+
+.titre-arc-en-ciel {
+    font-size: 4rem; 
+    font-weight: 700;
+    margin: 0;
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+    background: linear-gradient(124deg, #ff2400, #e81d1d, #e8b71d, #e3e81d, #1de840, #1ddde8, #2b1de8, #dd00f3, #dd00f3);
+    background-size: 1800% 1800%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: rainbow-animation 20s ease infinite;
+}
+
+.sous-titre {
+    font-size: 1.2rem;
+    color: #dcd0ff;
+    margin-top: 0.5rem;
+    margin-bottom: 2rem;
+    letter-spacing: 1px;
+}
+
+
+
+.cartes-navigation {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+}
+
+.carte {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(168, 129, 212, 0.5);
+    border-radius: 10px;
+    padding: 1.5rem;
+    width: 250px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+    .carte:hover {
+        transform: translateY(-10px) scale(1.05);
+        background-color: rgba(255, 255, 255, 0.1);
+        border-color: #dcd0ff;
+        box-shadow: 0 10px 20px rgba(168, 129, 212, 0.2);
+    }
+
+    .carte.disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+
+        .carte.disabled:hover {
+            transform: none;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-color: rgba(168, 129, 212, 0.5);
+            box-shadow: none;
+        }
+
+    .carte i {
+        color: #a881d4;
+        margin-bottom: 1rem;
+        transition: color 0.3s ease;
+    }
+
+    .carte:hover i {
+        color: #fff;
+    }
+
+    .carte h2 {
+        font-size: 1.5rem;
+        color: #fff;
+        margin-bottom: 0.5rem;
+    }
+
+    .carte p {
+        font-family: sans-serif; 
+        font-size: 0.9rem;
+        color: #dcd0ff;
+        line-height: 1.5;
+    }
