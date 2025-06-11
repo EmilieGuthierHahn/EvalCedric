@@ -4,6 +4,7 @@ using EvalCedric.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,13 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EvalCedric.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250611074333_NewMigrationWednesday")]
+    partial class NewMigrationWednesday
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.6")
+                .HasAnnotation("ProductVersion", "9.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -105,7 +108,7 @@ namespace EvalCedric.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Unicorn", b =>
+            modelBuilder.Entity("EvalCedric.Models.Unicorn", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -440,7 +443,7 @@ namespace EvalCedric.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Unicorn", b =>
+            modelBuilder.Entity("EvalCedric.Models.Unicorn", b =>
                 {
                     b.HasOne("EvalCedric.Models.Breed", "Breed")
                         .WithMany()
