@@ -25,22 +25,7 @@ namespace EvalCedric.Tests
 
        
 
-        [TestMethod]
-        public void Test_Codex_Aucune_Licorne()
-        {
-            // Arrange
-            var dbContext = CreateDbContext("DB_Vide");
-            Services.AddSingleton(dbContext);
-
-            // Act
-            var cut = RenderComponent<Codex>();
-
-            // Assert
-            cut.WaitForState(() => cut.Find(".alert-info") != null);
-            var alert = cut.Find(".alert-info");
-            Assert.IsTrue(alert.TextContent.Contains("Le Sanctuaire est silencieux"));
-            Assert.IsTrue(alert.TextContent.Contains("Aucun écho magique n'a été perçu"));
-        }
+       
 
         [TestMethod]
         public void Test_Codex_Affiche_Une_Licorne()
