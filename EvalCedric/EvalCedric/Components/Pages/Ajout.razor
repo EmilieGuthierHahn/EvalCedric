@@ -1,0 +1,137 @@
+﻿@page "/ajout"
+@rendermode InteractiveServer
+
+@using EvalCedric.Data
+@using EvalCedric.Models
+@using Microsoft.EntityFrameworkCore
+
+@inject ApplicationDbContext DbContext
+@inject NavigationManager NavigationManager
+
+<PageTitle>Ajouter une nouvelle Licorne</PageTitle>
+
+
+<div class="form-magique-container">
+    @if (availableBreeds == null)
+    {
+        <div class="text-center p-5">
+            <div class="spinner-border text-light" style="width: 3rem; height: 3rem;" role="status">
+                <span class="visually-hidden">Chargement...</span>
+            </div>
+            <p class="mt-3 fs-5">Invocation des archives des races...</p>
+        </div>
+    }
+    else
+    {
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-12">
+                    <h3 class="mb-3"><i class="fas fa-magic text-info"></i> Enregistrer une nouvelle créature dans le Sanctuaire</h3>
+                    <p class="text">Remplissez ce formulaire pour ajouter une nouvelle licorne au Codex. Chaque nouvelle découverte enrichit notre savoir.</p>
+                </div>
+            </div>
+
+            <EditForm Model="@newUnicorn" OnValidSubmit="HandleValidSubmit">
+                <DataAnnotationsValidator />
+                <ValidationSummary class="alert alert-danger" />
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="name" class="form-label"><strong>Nom de la Licorne</strong></label>
+                            <InputText id="name" class="form-control" @bind-Value="newUnicorn.Name" placeholder="Ex: Célestia, Crépuscule..." />
+                            <ValidationMessage For="@(() => newUnicorn.Name)" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="dob" class="form-label"><strong>Date de Naissance</strong></label>
+                            <InputDate id="dob" class="form-control" @bind-Value="newUnicorn.DateOfBirth" />
+                            <ValidationMessage For="@(() => newUnicorn.DateOfBirth)" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="color" class="form-label">Couleur de la robe</label>
+                            <InputText id="color" class="form-control" @bind-Value="newUnicorn.Color" placeholder="Ex: Nacre, Argenté, Ébène..." />
+                            <ValidationMessage For="@(() => newUnicorn.Color)" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="habitat" class="form-label">Habitat naturel</label>
+                            <InputText id="habitat" class="form-control" @bind-Value="newUnicorn.Habitat" placeholder="Ex: Forêt de Brocéliande, Pics Célestes..." />
+                            <ValidationMessage For="@(() => newUnicorn.Habitat)" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="breed" class="form-label"><strong>Race</strong></label>
+                            <InputSelect id="breed" class="form-select" @bind-Value="newUnicorn.BreedId">
+                                <option value="0" disabled>-- Sélectionnez une race --</option>
+                                @foreach (var breed in availableBreeds)
+                                {
+                                    <option value="@breed.Id">@breed.Name</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="@(() => newUnicorn.BreedId)" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="imageUrl" class="form-label">URL de l'image</label>
+                            <InputText id="imageUrl" class="form-control" @bind-Value="newUnicorn.ImageUrl" placeholder="https://..." />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="diet" class="form-label">Régime Alimentaire</label>
+                            <InputText id="diet" class="form-control" @bind-Value="newUnicorn.Diet" placeholder="Ex: Rayons de lune, Rosée du matin..." />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="origin" class="form-label">Origine connue</label>
+                            <InputText id="origin" class="form-control" @bind-Value="newUnicorn.Origin" placeholder="Ex: Née d'une constellation, Gardienne d'une source..." />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="powers" class="form-label">Pouvoirs Magiques</label>
+                            <InputTextArea id="powers" class="form-control" @bind-Value="newUnicorn.MagicalPowers" rows="4" placeholder="Décrivez les capacités uniques de la créature..." />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description / Notes de l'Archiviste</label>
+                            <InputTextArea id="description" class="form-control" @bind-Value="newUnicorn.Description" rows="5" placeholder="Ajoutez une description détaillée, son caractère, son histoire..." />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-3 border-top pt-3">
+                    <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-plus-circle"></i> Ajouter la créature au Codex</button>
+                    <button type="button" class="btn btn-secondary" @onclick="Annuler"><i class="fas fa-times"></i> Annuler la saisie</button>
+                </div>
+            </EditForm>
+        </div>
+    }
+</div>
+
+
+@code {
+    private Unicorn newUnicorn = new();
+
+    private List<Breed>? availableBreeds;
+
+    protected override async Task OnInitializedAsync()
+    {
+        availableBreeds = await DbContext.Breeds.ToListAsync();
+        newUnicorn.DateOfBirth = DateTime.Now;
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await DbContext.Unicorns.AddAsync(newUnicorn);
+        await DbContext.SaveChangesAsync();
+        NavigationManager.NavigateTo($"/profil/{newUnicorn.Id}");
+    }
+
+    private void Annuler()
+    {
+        NavigationManager.NavigateTo("/codex");
+    }
+}

@@ -13,7 +13,17 @@
 <h1><i class="fas fa-book-open"></i> Codex des Licornes</h1>
 <p>Consultez les dossiers de toutes les créatures magiques répertoriées.</p>
 
-@if (unicorns == null)
+<div class="row my-3">
+    <div class="col-md-6">
+        <div class="input-group">
+            <span class="input-group-text" style="background-color: #e9ecef;"><i class="fas fa-search"></i></span>
+            <input type="text" class="form-control" placeholder="Rechercher une licorne par son nom..."
+                   @bind="SearchTerm" @bind:event="oninput" />
+        </div>
+    </div>
+</div>
+
+@if (filteredUnicorns == null)
 {
     <div class="text-center mt-5">
         <div class="spinner-grow" style="color: #9b59b6; width: 3rem; height: 3rem;" role="status">
@@ -22,11 +32,11 @@
         <p class="mt-3 fs-4" style="color: #8e44ad;">Tissage des rayons de lune pour révéler les licornes...</p>
     </div>
 }
-else if (!unicorns.Any())
+else if (!filteredUnicorns.Any())
 {
     <div class="alert alert-info text-center" style="background-color: #eaf2f8; border-color: #aed6f1;">
         <h4 class="alert-heading" style="color: #1b4f72;">Le Sanctuaire est silencieux...</h4>
-        <p>Aucun écho magique n'a été perçu. La base de données ne contient aucune licorne.</p>
+        <p>Aucune licorne ne correspond à votre recherche.</p>
     </div>
 }
 else
@@ -46,7 +56,7 @@ else
                 </tr>
             </thead>
             <tbody>
-                @foreach (var unicorn in unicorns)
+                @foreach (var unicorn in filteredUnicorns)
                 {
                     <tr>
                         <td>
@@ -77,13 +87,53 @@ else
 
 
 @code {
-    private List<Unicorn>? unicorns;
+    // Liste complète de toutes les licornes, chargée une seule fois.
+    private List<Unicorn>? allUnicorns;
+    // Liste filtrée, celle qu'on affiche à l'écran.
+    private List<Unicorn>? filteredUnicorns;
+    // Variable pour stocker le texte de la recherche.
+    private string searchTerm = string.Empty;
+
+    // On transforme searchTerm en "propriété" pour automatiquement lancer le filtre à chaque modification.
+    private string SearchTerm
+    {
+        get => searchTerm;
+        set
+        {
+            searchTerm = value;
+            FilterUnicorns();
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
-        unicorns = await DbContext.Unicorns
-                                 .Include(u => u.Breed)
-                                 .ToListAsync();
+        // On charge toutes les licornes de la base de données.
+        allUnicorns = await DbContext.Unicorns
+                                      .Include(u => u.Breed)
+                                      .ToListAsync();
+        // Au début, la liste filtrée est identique à la liste complète.
+        filteredUnicorns = allUnicorns;
+    }
+
+    private void FilterUnicorns()
+    {
+        if (allUnicorns == null) return;
+
+        // Si la barre de recherche est vide, on affiche toutes les licornes.
+        if (string.IsNullOrWhiteSpace(searchTerm))
+        {
+            filteredUnicorns = allUnicorns;
+        }
+        else
+        {
+            // Sinon, on filtre la liste "allUnicorns" pour ne garder que celles
+            // dont le nom contient le texte de la recherche (insensible à la casse).
+            filteredUnicorns = allUnicorns
+                .Where(u => u.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+        // On demande à Blazor de rafraîchir l'affichage.
+        StateHasChanged();
     }
 
     private void VoirProfil(int unicornId)
