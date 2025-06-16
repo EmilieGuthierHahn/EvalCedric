@@ -1,0 +1,111 @@
+﻿/* Styles généraux pour la page Codex */
+h1 {
+    color: #5a2a99; /* Violet foncé pour le titre principal */
+    text-shadow: 1px 1px 3px #e0b6f5; /* Ombre lavande pour un effet magique */
+}
+
+/* Style de la barre de recherche */
+.search-bar {
+    margin-bottom: 1.5rem; /* Espace sous la barre de recherche */
+}
+
+    /* ::deep permet de styliser les éléments enfants (ceux de bootstrap) depuis ce fichier */
+    .search-bar ::deep .input-group-text {
+        background-color: #e0b6f5; /* Fond lavande pour l'icône de recherche */
+        border-color: #c8a2c8;
+        color: white;
+    }
+
+    .search-bar ::deep .form-control {
+        border-color: #c8a2c8;
+    }
+
+        .search-bar ::deep .form-control:focus {
+            border-color: #9b59b6;
+            box-shadow: 0 0 0 0.25rem rgba(155, 89, 182, 0.25);
+        }
+
+
+/* Style du tableau pour lui donner un aspect "carte" */
+.table-responsive {
+    border-radius: 15px;
+    overflow: hidden; /* Important pour que le border-radius s'applique à la table */
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+::deep .table {
+    border: none;
+}
+
+::deep thead.table-dark {
+    background: linear-gradient(45deg, #9b59b6, #8e44ad); /* Dégradé violet pour l'en-tête */
+    color: white;
+    border-bottom: none;
+}
+
+::deep tbody tr:hover {
+    background-color: #f8f0fe; /* Couleur de survol très légère (lavande pastel) */
+    transform: scale(1.015); /* Effet de zoom léger au survol */
+    transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
+    cursor: pointer;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+}
+
+/* Style des images dans le tableau */
+::deep .img-thumbnail {
+    border: 3px solid #e0b6f5; /* Bordure lavande */
+    padding: 2px;
+    border-radius: 10px;
+    transition: transform 0.3s ease;
+    width: 100px;
+    height: 75px;
+    object-fit: cover;
+}
+
+    ::deep .img-thumbnail:hover {
+        transform: scale(1.15); /* Zoom plus prononcé sur l'image */
+    }
+
+/* Style du badge pour la race de la licorne */
+::deep .badge-breed {
+    background-color: #5a2a99;
+    color: white;
+    font-size: 0.8em;
+    padding: 0.5em 0.75em;
+    border-radius: 20px;
+}
+
+/* Style du bouton "Voir profil" */
+::deep .btn-profile {
+    background-color: #aed6f1; /* Bleu pastel */
+    border-color: #aed6f1;
+    color: #1b4f72; /* Couleur du texte plus sombre pour le contraste */
+    font-weight: bold;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+    ::deep .btn-profile:hover {
+        background-color: #85c1e9;
+        transform: translateY(-2px); /* Petit effet de lévitation au survol */
+    }
+
+/* Style pour les messages de chargement et de recherche infructueuse */
+.loading-message .spinner-grow {
+    color: #9b59b6;
+    width: 3rem;
+    height: 3rem;
+}
+
+.loading-message p {
+    color: #8e44ad;
+    font-size: 1.2rem;
+}
+
+.info-message {
+    background-color: #eaf2f8;
+    border-color: #aed6f1;
+}
+
+    .info-message h4 {
+        color: #1b4f72;
+    }
