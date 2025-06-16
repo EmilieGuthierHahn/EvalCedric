@@ -1,0 +1,199 @@
+﻿@page "/races/gestion"
+@rendermode InteractiveServer
+
+@using EvalCedric.Data
+@using EvalCedric.Models
+@using Microsoft.EntityFrameworkCore
+
+@inject ApplicationDbContext DbContext
+@inject NavigationManager NavigationManager
+
+<PageTitle>Gestion des Races</PageTitle>
+
+<h1><i class="fas fa-cogs"></i> Gestion des Races</h1>
+<p>Consultez, modifiez et supprimez les races de licornes répertoriées dans le Sanctuaire.</p>
+
+@if (allBreeds == null)
+{
+    <p><em>Chargement des archives...</em></p>
+}
+else
+{
+    @if (!string.IsNullOrEmpty(userMessage))
+    {
+        <div class="alert @(isError ? "alert-danger" : "alert-success")">@userMessage</div>
+    }
+
+    <table class="table table-hover table-striped table-dark align-middle">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nom</th>
+                <th>Description</th>
+                <th class="text-end">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var breed in allBreeds)
+            {
+                <tr>
+                    <td>@breed.Id</td>
+                    <td>@breed.Name</td>
+                    <td>@breed.Description</td>
+                    <td class="text-end">
+                        <button class="btn btn-warning btn-sm me-2" @onclick="() => OpenEditModal(breed)">
+                            <i class="fas fa-pencil-alt"></i> Modifier
+                        </button>
+                        <button class="btn btn-danger btn-sm" @onclick="() => OpenDeleteModal(breed)">
+                            <i class="fas fa-trash-alt"></i> Supprimer
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<button class="btn btn-secondary mt-3" @onclick='() => NavigationManager.NavigateTo("/")'>
+    <i class="fas fa-arrow-left"></i> Retour à l'accueil
+</button>
+
+@if (showEditModal)
+{
+    <div class="modal fade show" style="display:block" aria-modal="true" role="dialog">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark text-white">
+                <div class="modal-header">
+                    <h5 class="modal-title">Modifier la race : @breedToEdit.Name</h5>
+                    <button type="button" class="btn-close btn-close-white" @onclick="CloseEditModal"></button>
+                </div>
+                <EditForm Model="breedToEdit" OnValidSubmit="HandleEditSubmit">
+                    <div class="modal-body">
+                        <DataAnnotationsValidator />
+                        <div class="mb-3">
+                            <label class="form-label">Nom</label>
+                            <InputText class="form-control" @bind-Value="breedToEdit.Name" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <InputTextArea class="form-control" @bind-Value="breedToEdit.Description" rows="4" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @onclick="CloseEditModal">Annuler</button>
+                        <button type="submit" class="btn btn-success">Enregistrer</button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+}
+
+@if (showDeleteModal)
+{
+    <div class="modal fade show" style="display:block" aria-modal="true" role="dialog">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark text-white">
+                <div class="modal-header border-danger">
+                    <h5 class="modal-title">Confirmation de suppression</h5>
+                    <button type="button" class="btn-close btn-close-white" @onclick="CloseDeleteModal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>@deleteMessage</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseDeleteModal">Annuler</button>
+                    @if (canDelete)
+                    {
+                        <button type="button" class="btn btn-danger" @onclick="ConfirmDelete">Confirmer la suppression</button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+}
+
+
+@code {
+    private List<Breed> allBreeds;
+    private Breed breedToEdit;
+    private Breed breedToDelete;
+
+    private bool showEditModal = false;
+    private bool showDeleteModal = false;
+    private bool canDelete = false;
+
+    private string userMessage;
+    private string deleteMessage;
+    private bool isError;
+
+    protected override async Task OnInitializedAsync()
+    {
+        allBreeds = await DbContext.Breeds.OrderBy(b => b.Name).ToListAsync();
+    }
+
+    // --- Logique de MODIFICATION ---
+    private void OpenEditModal(Breed breed)
+    {
+        breedToEdit = new Breed { Id = breed.Id, Name = breed.Name, Description = breed.Description };
+        showEditModal = true;
+    }
+
+    private void CloseEditModal() => showEditModal = false;
+
+    private async Task HandleEditSubmit()
+    {
+        var existingBreed = await DbContext.Breeds.FindAsync(breedToEdit.Id);
+        if (existingBreed != null)
+        {
+            existingBreed.Name = breedToEdit.Name;
+            existingBreed.Description = breedToEdit.Description;
+            await DbContext.SaveChangesAsync();
+            userMessage = $"La race '{existingBreed.Name}' a été mise à jour.";
+            isError = false;
+        }
+        CloseEditModal();
+        await OnInitializedAsync(); // Rafraîchir la liste
+        StateHasChanged();
+    }
+
+
+    // --- Logique de SUPPRESSION ---
+    private async Task OpenDeleteModal(Breed breed)
+    {
+        userMessage = string.Empty;
+        breedToDelete = breed;
+
+        // VÉRIFICATION DE SÉCURITÉ : La race est-elle utilisée ?
+        bool isUsed = await DbContext.Unicorns.AnyAsync(u => u.BreedId == breed.Id);
+        if (isUsed)
+        {
+            deleteMessage = $"Impossible de supprimer la race '{breed.Name}' car elle est assignée à au moins une licorne. Veuillez d'abord modifier les licornes concernées.";
+            canDelete = false;
+        }
+        else
+        {
+            deleteMessage = $"Êtes-vous sûr de vouloir supprimer la race '{breed.Name}' ? Cette action est irréversible.";
+            canDelete = true;
+        }
+        showDeleteModal = true;
+    }
+
+    private void CloseDeleteModal() => showDeleteModal = false;
+
+    private async Task ConfirmDelete()
+    {
+        if (breedToDelete != null && canDelete)
+        {
+            DbContext.Breeds.Remove(breedToDelete);
+            await DbContext.SaveChangesAsync();
+            userMessage = $"La race '{breedToDelete.Name}' a été supprimée.";
+            isError = false;
+        }
+        CloseDeleteModal();
+        await OnInitializedAsync(); // Rafraîchir la liste
+        StateHasChanged();
+    }
+}
