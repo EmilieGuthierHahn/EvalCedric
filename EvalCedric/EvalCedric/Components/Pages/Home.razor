@@ -1,13 +1,15 @@
 ﻿@page "/"
 @rendermode InteractiveServer
+
+@using EvalCedric.Data
+@using EvalCedric.Models
+
 @inject NavigationManager NavigationManager
+@inject ApplicationDbContext DbContext
 
 <PageTitle>Sanctuaire des Licornes - Accueil</PageTitle>
 
-
 <div class="accueil-container">
-
-  
     <div class="etoiles-filantes">
         <div class="etoile"></div>
         <div class="etoile"></div>
@@ -16,16 +18,9 @@
         <div class="etoile"></div>
     </div>
 
-  
     <div class="accueil-content">
-
-        <h1 class="titre-arc-en-ciel">
-            Sanctuaire des Licornes
-        </h1>
-
-        <p class="sous-titre">
-            Là où la magie prend vie et les légendes galopent librement.
-        </p>
+        <h1 class="titre-arc-en-ciel">Sanctuaire des Licornes</h1>
+        <p class="sous-titre">Là où la magie prend vie et les légendes galopent librement.</p>
 
         <div class="cartes-navigation">
             <div class="carte" @onclick='() => NavigationManager.NavigateTo("/codex")'>
@@ -38,7 +33,78 @@
                 <h2>Ajouter une Créature</h2>
                 <p>Un nouvel écho magique a été perçu. Répertoriez votre trouvaille.</p>
             </div>
-        </div>
 
+            <div class="carte" @onclick="OpenAddBreedModal">
+                <i class="fas fa-dna fa-3x"></i>
+                <h2>Ajouter une Race</h2>
+                <p>Découvrez et classifiez une nouvelle lignée de créatures magiques.</p>
+            </div>
+
+            <div class="carte" @onclick='() => NavigationManager.NavigateTo("/races/gestion")'>
+                <i class="fas fa-cogs fa-3x"></i>
+                <h2>Gérer les Races</h2>
+                <p>Consultez et gérez les lignées de créatures existantes.</p>
+            </div>
+        </div>
     </div>
 </div>
+
+
+@if (showAddBreedModal)
+{
+    <div class="modal fade show" style="display:block" aria-modal="true" role="dialog">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content form-magique-container" style="border-width: 2px;">
+                <div class="modal-header" style="border-bottom: 1px solid #7b4fde;">
+                    <h5 class="modal-title"><i class="fas fa-dna"></i> Ajouter une nouvelle Race</h5>
+                    <button type="button" class="btn-close btn-close-white" @onclick="CloseAddBreedModal"></button>
+                </div>
+                <div class="modal-body">
+                    <EditForm Model="newBreed" OnValidSubmit="HandleAddBreedSubmit">
+                        <DataAnnotationsValidator />
+
+                        <div class="mb-3">
+                            <label for="name" class="form-label"><strong>Nom de la Race</strong></label>
+                            <InputText id="name" class="form-control" @bind-Value="newBreed.Name" placeholder="Ex: Corne de Cristal..." />
+                            <ValidationMessage For="@(() => newBreed.Name)" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label"><strong>Description</strong></label>
+                            <InputTextArea id="description" class="form-control" @bind-Value="newBreed.Description" rows="4" placeholder="Décrivez les traits de cette race..." />
+                            <ValidationMessage For="@(() => newBreed.Description)" />
+                        </div>
+
+                        <div class="modal-footer" style="border-top: 1px solid #7b4fde;">
+                            <button type="button" class="btn btn-secondary" @onclick="CloseAddBreedModal">Annuler</button>
+                            <button type="submit" class="btn btn-primary">Enregistrer</button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+}
+
+@code {
+    private bool showAddBreedModal = false;
+    private Breed newBreed = new() { Name = string.Empty, Description = string.Empty };
+
+    private void OpenAddBreedModal()
+    {
+        newBreed = new() { Name = string.Empty, Description = string.Empty };
+        showAddBreedModal = true;
+    }
+
+    private void CloseAddBreedModal() => showAddBreedModal = false;
+
+    private async Task HandleAddBreedSubmit()
+    {
+        if (string.IsNullOrWhiteSpace(newBreed.Name) || string.IsNullOrWhiteSpace(newBreed.Description)) return;
+
+        await DbContext.Breeds.AddAsync(newBreed);
+        await DbContext.SaveChangesAsync();
+        CloseAddBreedModal();
+    }
+}
